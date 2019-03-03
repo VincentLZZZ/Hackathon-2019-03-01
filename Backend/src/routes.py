@@ -35,7 +35,7 @@ def post_test_events(id):
         emission = helpers.calc_emission(persona)
         stop = Stop(username = name, persona = persona, emission = emission, chain_id = id)
         chain.stops.append(stop)
-        chain.total_emission += emission
+        chain.total_emission = chain.total_emission + emission
         chain.current_owner = name
         db.session.add(stop)
         db.session.commit()
@@ -50,21 +50,22 @@ def create_link():
     name = post_body.get('username')
     persona = post_body.get('persona')
     emission = helpers.calc_emission(persona)
-    if name != 'Farmer/Producer':
+    if persona != 'Farmer/Producer':
         return json.dumps({'success': False, 'error': 'you cannot initiate a chain'}), 404
     else:
         chain = Supplychain(name = 'tomato')
-        stop = Stop(username = name, persona = persona, emission = emission, chain_id = chain.id)
-        chain.current_owner = stop.name
-        chain.total_emission += emission
-        db.session.add(stop)
         db.session.add(chain)
         db.session.commit()
-        return chain.id
+        stop = Stop(username = name, persona = persona, emission = emission, chain_id = chain.id)
+        chain.current_owner = stop.username
+        chain.total_emission = chain.total_emission + emission
+        db.session.add(stop)
+        db.session.commit()
+        return json.dumps({'success': True,'Supplychain': chain.id})
 
     
 @app.route('/api/<int:id>/',methods = ['GET'])
-def display():
+def display(id):
     chain = Supplychain.query.filter_by(id = id).first()
     if chain is not None:
         return json.dumps({'success': True, 'data': [stop.serialize() for stop in chain.stops]})

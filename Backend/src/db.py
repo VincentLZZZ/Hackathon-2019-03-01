@@ -1,13 +1,15 @@
 from flask_sqlalchemy import SQLAlchemy
 
-class User(db.Model):
-    __tablename__ = 'user'
+db = SQLAlchemy()
+
+class Stop(db.Model):
+    __tablename__ = 'stop'
     id = db.Column(db.Integer, primary_key=True)
 
     username = db.Column(db.String, nullable=False)
     persona = db.Column(db.String, nullable = False)
-    emission = db.Column(db.String, nullable = False)
-    chain_id = db.Column(db.Integer, db.ForeignKey(supplychain.id),nullable = False)
+    emission = db.Column(db.Integer, nullable = False)
+    chain_id = db.Column(db.Integer, db.ForeignKey('supplychain.id'),nullable = False)
 
     def __init__(self, **kwargs):
         self.username = kwargs.get('username','')
@@ -35,7 +37,8 @@ class Supplychain(db.Model):
 
 
     def __init__(self, **kwargs):
-        self.name = kwargs.get('name', '')
+        self.name = kwargs.get('name')
+        self.total_emission = 0
 
 
     def serialize(self):
