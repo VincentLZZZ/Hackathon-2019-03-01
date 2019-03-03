@@ -68,7 +68,7 @@ def create_link():
 def display(id):
     chain = Supplychain.query.filter_by(id = id).first()
     if chain is not None:
-        return json.dumps({'success': True, 'data': [stop.serialize() for stop in chain.stops]})
+        return json.dumps({'success': True, 'data': [stop.serialize() for stop in chain.stops],'total_emission':chain.total_emission})
     else:
         return json.dumps({'success': False, 'error': 'No chain found'})
 
